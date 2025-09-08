@@ -26,8 +26,8 @@ dns:
     - 127.0.0.1:7874
   upstream_dns_file: ""
   bootstrap_dns:
-    - 61.144.56.100
-    - 61.144.56.101
+    - 210.21.4.130
+    - 221.5.88.88
   fallback_dns: []
   upstream_mode: parallel
   fastest_timeout: 1s
