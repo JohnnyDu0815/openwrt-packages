@@ -93,13 +93,12 @@ FIRMWARE_DOWNLOAD_PATH="/mnt/${EMMC_NAME}${PARTITION_NAME}4"
 if [[ -s "${AMLOGIC_SOC_FILE}" ]]; then
     source "${AMLOGIC_SOC_FILE}" 2>/dev/null
     PLATFORM="${PLATFORM}"
-    SOC="${SOC}"
     BOARD="${BOARD}"
 else
     tolog "${AMLOGIC_SOC_FILE} file is missing!" "1"
 fi
-if [[ -z "${PLATFORM}" || -z "$(echo "${support_platform[@]}" | grep -w "${PLATFORM}")" || -z "${SOC}" || -z "${BOARD}" ]]; then
-    tolog "Missing [ PLATFORM / SOC / BOARD ] value in ${AMLOGIC_SOC_FILE} file." "1"
+if [[ -z "${PLATFORM}" || -z "$(echo "${support_platform[@]}" | grep -w "${PLATFORM}")" || -z "${BOARD}" ]]; then
+    tolog "Missing [ PLATFORM / BOARD ] value in ${AMLOGIC_SOC_FILE} file." "1"
 fi
 
 tolog "PLATFORM: [ ${PLATFORM} ], BOARD: [ ${BOARD} ], Use in [ ${EMMC_NAME} ]"
@@ -189,13 +188,13 @@ check_updated() {
     )"
 
     # Set the regular expression for the OpenWrt filename
-    op_file_pattern=".*_${BOARD}_.*k${main_line_version}\..*${firmware_suffix}"
+    op_file_pattern=".*_${BOARD}_.*k${main_line_version}\.[0-9]+.*${firmware_suffix}"
     # Find the <li> list item where the OpenWrt file is located
     li_block=$(awk -v pattern="${op_file_pattern}" -v RS='</li>' '$0 ~ pattern { print $0 "</li>"; exit }' <<<"${html_code}")
     [[ -z "${li_block}" ]] && tolog "02.03.01 No matching download links found." "1"
 
     # Find the OpenWrt filename
-    latest_url=$(echo "${li_block}" | grep -o "/[^\"]*_${BOARD}_.*k${main_line_version}\.[^\"']*${firmware_suffix}" | sort -urV | head -n 1 | xargs basename 2>/dev/null)
+    latest_url=$(echo "${li_block}" | grep -oE "/[^\"]*_${BOARD}_.*k${main_line_version}\.[0-9]+[^\"]*${firmware_suffix}" | sort -urV | head -n 1 | xargs basename 2>/dev/null)
     tolog "02.03.02 OpenWrt file: ${latest_url}"
 
     # Find the date of the latest update
